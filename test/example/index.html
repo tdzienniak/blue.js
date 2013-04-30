@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Example game</title>
+    <script src="libs/head.load.min.js"></script>
+    <script type="text/javascript">
+    head.js("../../src/core/Entity.js",
+            "../../src/core/OrderedLinkedList.js",
+            "../../src/core/Core.js",
+            "../../src/ticker/Ticker.js",
+            "utils/Vector.js",
+            "components/Collision.js",
+            "components/Position.js",
+            "components/RenderCircle.js",
+            "components/StageDimensions.js",
+            "components/Velocity.js",
+            "systems/CollisionSystem.js",
+            "systems/MotionSystem.js",
+            "systems/RenderSystem.js",
+            function () {
+                var canvas = document.createElement('canvas');
+                canvas.width = 512;
+                canvas.height = 512;
+                document.body.appendChild(canvas);
+                var ctx = canvas.getContext('2d');
+
+                var core = new BlueJS.Core();
+                core.addSystem(new CollisionSystem(), 1).
+                    addSystem(new MotionSystem(), 2).
+                    addSystem(new RenderSystem(ctx), 3);
+
+                var stage = new BlueJS.Entity(core);
+                stage.addComponent(new StageDimensions(512, 512));
+
+                core.addEntity(stage);
+
+                var ball = new BlueJS.Entity(core);
+                ball.addComponent(new Position(150, 100))
+                    .addComponent(new Velocity(new Vector([70,20])))
+                    .addComponent(new Collision(20))
+                    .addComponent(new RenderCircle("blue"));
+
+                core.addEntity(ball);
+
+                var ball2 = new BlueJS.Entity(core);
+                ball2.addComponent(new Position(200, 100))
+                    .addComponent(new Velocity(new Vector([50,30])))
+                    .addComponent(new Collision(20))
+                    .addComponent(new RenderCircle("green"));
+
+                core.addEntity(ball2);
+
+                var ball3 = new BlueJS.Entity(core);
+                ball3.addComponent(new Position(200, 150))
+                    .addComponent(new Velocity(new Vector([80,20])))
+                    .addComponent(new Collision(20))
+                    .addComponent(new RenderCircle("red"));
+
+                core.addEntity(ball3);
+
+                BlueJS.Ticker.useRAF(false);
+                BlueJS.Ticker.setFPS(60);
+                BlueJS.Ticker.addListener(core.update);
+                BlueJS.Ticker.start();
+            });
+ 
+    </script>
+    <style>
+        canvas {
+            border: 2px dotted gray;
+        }
+    </style>
+</head>
+<body>
+    
+</body>
+</html>
