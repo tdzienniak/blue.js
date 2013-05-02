@@ -7,12 +7,12 @@
         beforUpdate: function () {/*do nothing*/},
         update: function (delta) {
             var dimensions = this.core.getComponentsByType("StageDimensions")[0],
-                components = this.core.getComponentsGroupedByEntity(["Position", "Velocity", "Collision"]);
+                collisionNodes = this.core.getNodes("CollisionNode");
 
-            for (var id in components) {
-                var position = components[id][0],
-                    velocity = components[id][1],
-                    collision = components[id][2];
+            for (var i = 0, len = collisionNodes.length; i < len; i++) {
+                var position = collisionNodes[i].position,
+                    velocity = collisionNodes[i].velocity,
+                    collision = collisionNodes[i].collision;
                 //console.log(position);
 
                 if (position.x <= collision.radius || position.x >= (dimensions.width - collision.radius)) {

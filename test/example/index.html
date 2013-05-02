@@ -9,6 +9,7 @@
             "../../src/core/OrderedLinkedList.js",
             "../../src/core/Core.js",
             "../../src/ticker/Ticker.js",
+            "../../src/core/Bits.js",
             "utils/Vector.js",
             "components/Collision.js",
             "components/Position.js",
@@ -25,37 +26,51 @@
                 document.body.appendChild(canvas);
                 var ctx = canvas.getContext('2d');
 
-                var core = new BlueJS.Core();
+                var core = new BlueJS.Core(["Collision", "Position", "RenderCircle", "StageDimensions", "Velocity"], {
+                    MotionNode: {
+                        position: "Position",
+                        velocity: "Velocity"
+                    },
+                    CollisionNode: {
+                        position: "Position",
+                        velocity: "Velocity",
+                        collision: "Collision"
+                    },
+                    RenderNode: {
+                        position: "Position",
+                        render: "RenderCircle"
+                    }
+                });
                 core.addSystem(new CollisionSystem(), 1).
                     addSystem(new MotionSystem(), 2).
                     addSystem(new RenderSystem(ctx), 3);
 
                 var stage = new BlueJS.Entity(core);
-                stage.addComponent(new StageDimensions(512, 512));
+                stage.add(new StageDimensions(512, 512));
 
                 core.addEntity(stage);
 
                 var ball = new BlueJS.Entity(core);
-                ball.addComponent(new Position(150, 100))
-                    .addComponent(new Velocity(new Vector([70,20])))
-                    .addComponent(new Collision(20))
-                    .addComponent(new RenderCircle("blue"));
+                ball.add(new Position(150, 100))
+                    .add(new Velocity(new Vector([70,20])))
+                    .add(new Collision(20))
+                    .add(new RenderCircle("blue"));
 
                 core.addEntity(ball);
 
                 var ball2 = new BlueJS.Entity(core);
-                ball2.addComponent(new Position(200, 100))
-                    .addComponent(new Velocity(new Vector([50,30])))
-                    .addComponent(new Collision(20))
-                    .addComponent(new RenderCircle("green"));
+                ball2.add(new Position(200, 100))
+                    .add(new Velocity(new Vector([50,30])))
+                    .add(new Collision(20))
+                    .add(new RenderCircle("green"));
 
                 core.addEntity(ball2);
 
                 var ball3 = new BlueJS.Entity(core);
-                ball3.addComponent(new Position(200, 150))
-                    .addComponent(new Velocity(new Vector([80,20])))
-                    .addComponent(new Collision(20))
-                    .addComponent(new RenderCircle("red"));
+                ball3.add(new Position(200, 150))
+                    .add(new Velocity(new Vector([80,20])))
+                    .add(new Collision(20))
+                    .add(new RenderCircle("red"));
 
                 core.addEntity(ball3);
 

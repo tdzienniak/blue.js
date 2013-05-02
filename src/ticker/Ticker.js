@@ -46,7 +46,7 @@ this.BlueJS = this.BlueJS || {};
 
         ticks++;
 
-        ticker(tick, FPS);
+        //ticker(tick, FPS);
     }
 
     Ticker = {
@@ -74,7 +74,7 @@ this.BlueJS = this.BlueJS || {};
             callbacks.push(callback);
         },
         start: function () {
-            if (USE_RAF) {
+            /*if (USE_RAF) {
                 ticker = (function () {
                     return  window.requestAnimationFrame ||
                             window.webkitRequestAnimationFrame ||
@@ -87,12 +87,16 @@ this.BlueJS = this.BlueJS || {};
                 ticker = function (callback, fps) {
                     window.setTimeout(callback, 1000 / fps);
                 };
-            }
+            }*/
+
+            ticker = function (callback, fps) {
+                    window.setInterval(callback, 1000 / fps);
+                };
 
             console.log(ticker);
 
             isRunning = true;
-            tick();
+            ticker(tick);
         }
     };
 

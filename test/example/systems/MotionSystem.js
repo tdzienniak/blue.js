@@ -6,11 +6,11 @@
     MotionSystem.prototype = {
         beforUpdate: function () {/*do nothing*/},
         update: function (delta) {
-            var motionComponents = this.core.getComponentsGroupedByEntity(["Position", "Velocity"]);
+            var motionNodes = this.core.getNodes("MotionNode");
 
-            for (var id in motionComponents) {
-                var position = motionComponents[id][0],
-                    velocity = motionComponents[id][1];
+            for (var i = 0, len = motionNodes.length; i < len; i++) {
+                var position = motionNodes[i].position,
+                    velocity = motionNodes[i].velocity;
 
                 position.prevX = position.x;
                 position.prevY = position.y;

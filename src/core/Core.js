@@ -2,13 +2,43 @@ this.BlueJS = this.BlueJS || {};
 
 (function (app) {
     var systems = new BlueJS.OrderedLinkedList(),
-        components = [],
+        //componentTypeBit = {},
+        nextBit = 0,
         ids = [],
         entities = [],
         greatestId = 0,
-        idsToReuse = [];
+        idsToReuse = [],
+        nodeBitMask = {};
 
-    function Core () {
+    function Core (components, nodes) {
+        this.componentTypeBit = {},
+        this.nodeList = [],
+        this.nodeBitMask = {};
+
+        for (var i = 0, len = components.length; i < len; i++) {
+            this.componentTypeBit[components[i]] = this.getNextTypeBit();
+        }
+
+        for (var node in nodes) {
+            var nodeComponents = nodes[node],
+                nodeBitMask = new Bits();
+
+            for (var component in nodeComponents) {
+                var componentType = nodeComponents[component];
+
+                nodeBitMask.set(this.componentTypeBit[componentType]);
+            }
+
+            var newNode = nodeComponents;
+
+            newNode.type = node;
+            newNode.bitMask = nodeBitMask;
+
+            this.nodeList.push(newNode);
+
+            this.nodeBitMask[node] = nodeBitMask;
+        }
+
         this.updating = false;
     }
 
@@ -39,6 +69,19 @@ this.BlueJS = this.BlueJS || {};
                 var componentsArray = components[entityId];
             }
         },*/
+        getNextTypeBit: function () {
+            return nextBit++;
+        },
+        getComponentBitSet: function (type) {
+            var bit = this.componentTypeBit[type],
+                bitset = new Bits();
+
+            if (typeof bit !== "undefined") {
+                bitset.set(bit);
+            }
+
+            return bitset;
+        },
         generateEntityId: function () {
             return idsToReuse.pop() || greatestId + 1;
         },
@@ -53,7 +96,7 @@ this.BlueJS = this.BlueJS || {};
             }
 
             entities.push(entity);
-            console.log(entities, components);
+            console.log(entities);
             return this;
         },
         removeEntity: function () {
@@ -78,12 +121,28 @@ this.BlueJS = this.BlueJS || {};
 
             return this;
         },
+        getNodes: function (type) {
+            var nodes = [];
+
+            for (var i = 0, len = entities.length; i < len; i++) {
+                var entityBitMaskCopy = entities[i].bitComponents.clone();
+
+                entityBitMaskCopy.and(this.nodeBitMask[type]);
+
+                if (entityBitMaskCopy.equals(this.nodeBitMask[type])) {
+                    nodes.push(entities[i].getNode(type));
+                }
+            }
+
+            return nodes;
+        },
         getComponentsByType: function (type) {
             var matchedComponents = [];
 
-            for (var i = 0, len = components.length; i < len; i++) {
-                if (components[i].type === type) {
-                    matchedComponents.push(components[i]);
+            for (var i = 0, len = entities.length; i < len; i++) {
+
+                if (entities[i].bitComponents.test(this.componentTypeBit[type])) {
+                    matchedComponents.push(entities[i].components[type]);
                 }
             }
 
@@ -101,7 +160,7 @@ this.BlueJS = this.BlueJS || {};
 
             return matchedComponents;
         },
-        getComponentsGroupedByEntity: function (array) {
+        /*getComponentsGroupedByEntity: function (array) {
             var componentGroups = {};
 
             for (var i = 0, compLen = components.length; i < compLen; i++) {
@@ -123,7 +182,7 @@ this.BlueJS = this.BlueJS || {};
             }
 
             return componentGroups;
-        },
+        },*/
         addSystem: function (system, priority) {
             system.core = this;
             systems.insert(system, priority);

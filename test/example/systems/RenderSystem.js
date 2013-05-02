@@ -7,13 +7,13 @@
     RenderSystem.prototype = {
         beforUpdate: function () {/*do nothing*/},
         update: function (delta) {
-            var components = this.core.getComponentsGroupedByEntity(["Position", "RenderCircle"]);
+            var renderNodes = this.core.getNodes("RenderNode");
             //console.log(components);
             this.ctx.clearRect(0, 0, 512, 512);
 
-            for (var id in components) {
-                var position = components[id][0],
-                    render = components[id][1];
+            for (var i = 0, len = renderNodes.length; i < len; i++) {
+                var position = renderNodes[i].position,
+                    render = renderNodes[i].render;
 
 
                 //console.log(this.ctx);
