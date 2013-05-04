@@ -2,13 +2,10 @@ this.BlueJS = this.BlueJS || {};
 
 (function (app) {
     var systems = new BlueJS.OrderedLinkedList(),
-        //componentTypeBit = {},
         nextBit = 0,
-        ids = [],
         entities = [],
         greatestId = 0,
-        idsToReuse = [],
-        nodeBitMask = {};
+        idsToReuse = [];
 
     function Core (components, nodes) {
         this.componentTypeBit = {},
@@ -43,32 +40,6 @@ this.BlueJS = this.BlueJS || {};
     }
 
     Core.prototype = {
-        /*
-            components = [{
-                name: "position",
-                type: "Position"
-            },
-            {
-                name: "motion",
-                type: "Motion"
-            }];
-         */
-        /*newCollection: function (name, components) {
-            collections[name] = components;
-        },
-        getCollection: function (name) {
-            var collection = collections[name];
-
-            if (typeof collection === "undefined") {
-                throw new Error("There is no such collection. Consider defining it.");
-            }
-
-            var matchedComponents = [];
-
-            for (entityId in components) {
-                var componentsArray = components[entityId];
-            }
-        },*/
         getNextTypeBit: function () {
             return nextBit++;
         },
@@ -96,26 +67,13 @@ this.BlueJS = this.BlueJS || {};
             }
 
             entities.push(entity);
-            console.log(entities);
             return this;
         },
-        removeEntity: function () {
-
-        },
-        addComponent: function (entity, component) {
-            //this.removeComponent(entity, component.type);
-
-            //ids.push(entity.id);
-            components.push(component);
-
-            return this;
-        },
-        removeComponent: function (entity, type) {
-            for (var i = 0, len = components.length; i < len; i++) {
-                if (components[i].id === entity.id && components[i].type === type) {
-                    //ids.splice(i, 1);
-                    components.splice(i, 1);
-                    break;
+        removeEntity: function (entity) {
+            for (var i = 0, len = entities.length; i < len; i++) {
+                if (entities[i] === entity) {
+                    entities.splice(i, 1);
+                    return;
                 }
             }
 
@@ -125,7 +83,7 @@ this.BlueJS = this.BlueJS || {};
             var nodes = [];
 
             for (var i = 0, len = entities.length; i < len; i++) {
-                var entityBitMaskCopy = entities[i].bitComponents.clone();
+                var entityBitMaskCopy = entities[i].componentsBits.clone();
 
                 entityBitMaskCopy.and(this.nodeBitMask[type]);
 
@@ -141,7 +99,7 @@ this.BlueJS = this.BlueJS || {};
 
             for (var i = 0, len = entities.length; i < len; i++) {
 
-                if (entities[i].bitComponents.test(this.componentTypeBit[type])) {
+                if (entities[i].componentsBits.test(this.componentTypeBit[type])) {
                     matchedComponents.push(entities[i].components[type]);
                 }
             }
@@ -160,29 +118,6 @@ this.BlueJS = this.BlueJS || {};
 
             return matchedComponents;
         },
-        /*getComponentsGroupedByEntity: function (array) {
-            var componentGroups = {};
-
-            for (var i = 0, compLen = components.length; i < compLen; i++) {
-                var component = components[i];
-
-                for (var j = 0, arrayLen = array.length; j < arrayLen; j++) {
-                    if (component.type === array[j]) {
-                        var id = component.id;
-                        componentGroups[id] = componentGroups[id] || [];
-                        componentGroups[id].push(component);
-                    }
-                }
-            }
-
-            for (var i in componentGroups) {
-                if (componentGroups[i].length !== array.length) {
-                    delete componentGroups[i];
-                }
-            }
-
-            return componentGroups;
-        },*/
         addSystem: function (system, priority) {
             system.core = this;
             systems.insert(system, priority);
@@ -202,7 +137,6 @@ this.BlueJS = this.BlueJS || {};
             this.updating = true;
 
             for (var node = systems.head; node; node = node.next) {
-
                 node.data.update(delta);
             }
 

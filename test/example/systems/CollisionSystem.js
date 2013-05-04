@@ -16,7 +16,7 @@
                 //console.log(position);
 
                 if (position.x <= collision.radius || position.x >= (dimensions.width - collision.radius)) {
-                    console.log("reverse x");
+                    //console.log("reverse x");
                     velocity.velocity.reverseX();
                 } else if (position.y <= collision.radius || position.y >= (dimensions.height - collision.radius)) {
                     velocity.velocity.reverseY();

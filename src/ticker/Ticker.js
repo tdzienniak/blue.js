@@ -22,15 +22,17 @@ this.BlueJS = this.BlueJS || {};
             return;
         }
 
-        //if ( ! useRAF) {
+        if ( ! USE_RAF) {
             var time = time || new Date().getTime();
-        //}
+        }
 
         var delta = time - lastTimeValue;
 
         if (delta >= MAX_FRAME_TIME) {
             delta = 1000 / FPS;
         }
+
+        currentFPS = 1000 / delta;
 
         lastTimeValue = time;
 
@@ -46,7 +48,9 @@ this.BlueJS = this.BlueJS || {};
 
         ticks++;
 
-        //ticker(tick, FPS);
+        if (USE_RAF) {
+            ticker(tick, FPS);
+        }
     }
 
     Ticker = {
@@ -62,6 +66,9 @@ this.BlueJS = this.BlueJS || {};
         getFPS: function () {
             return FPS;
         },
+        getTicks: function () {
+            return ticks;
+        },
         setPaused: function (bool) {
             PAUSE = bool;
 
@@ -74,7 +81,7 @@ this.BlueJS = this.BlueJS || {};
             callbacks.push(callback);
         },
         start: function () {
-            /*if (USE_RAF) {
+            if (USE_RAF) {
                 ticker = (function () {
                     return  window.requestAnimationFrame ||
                             window.webkitRequestAnimationFrame ||
@@ -85,17 +92,12 @@ this.BlueJS = this.BlueJS || {};
                 })();
             } else {
                 ticker = function (callback, fps) {
-                    window.setTimeout(callback, 1000 / fps);
-                };
-            }*/
-
-            ticker = function (callback, fps) {
                     window.setInterval(callback, 1000 / fps);
                 };
-
-            console.log(ticker);
+            }
 
             isRunning = true;
+            
             ticker(tick);
         }
     };
